@@ -3,7 +3,7 @@ set clipboard=unnamedplus " Enables the clipboard between Vim/Neovim and other a
 set completeopt=noinsert,menuone,noselect " Modifies the auto-complete menu to behave more like an IDE.
 set cursorline " Highlights the current line in the editor
 set hidden " Hide unused buffers
-set autoindent " rcarriga/nvim-notifrcarriga/nvim-notircarriga/nvim-notifyyfyyIndent a new linefyyIndent a new line
+set autoindent " Indent a new line
 set inccommand=split " Show replacements in a split screen
 set mouse=a " Allow to use the mouse in the editor
 set number " Shows the line numbers
@@ -47,13 +47,35 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'preservim/tagbar'
 Plug 'tc50cal/vim-terminal'
+Plug 'leafgarland/typescript-vim'
+Plug 'Quramy/vim-js-pretty-template'
+Plug 'Valloric/YouCompleteMe'
+Plug 'vim-syntastic/syntastic'
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'Quramy/tsuquyomi'
 call plug#end()
 
+" For Angular
+let g:typescript_compiler_binary = 'tsc'
+let g:typescript_compiler_options = ''
+autocmd QuickFixCmdPost [^l]* nested cwindow
+autocmd QuickFixCmdPost    l* nested lwindow
+
+autocmd FileType typescript JsPreTmpl html
+autocmd FileType typescript syn clear foldBraces
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:tsuquyomi_disable_quickfix = 1
+let g:syntastic_typescript_checkers = ['tsuquyomi'] 
+" Stop
 
 nnoremap <C-f> :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
-
 
 colorscheme gruvbox
 let g:bargreybars_auto=0
