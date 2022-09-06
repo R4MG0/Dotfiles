@@ -5,7 +5,7 @@ set cursorline " Highlights the current line in the editor
 set hidden " Hide unused buffers
 set autoindent " Indent a new line
 set inccommand=split " Show replacements in a split screen
-set mouse=a " Allow to use the mouse in the editor
+set mouse=nvc " Allow to use the mouse in the editor
 set number " Shows the line numbers
 set relativenumber
 set splitbelow splitright " Change the split screen behavior
@@ -49,10 +49,11 @@ Plug 'preservim/tagbar'
 Plug 'tc50cal/vim-terminal'
 Plug 'leafgarland/typescript-vim'
 Plug 'Quramy/vim-js-pretty-template'
-Plug 'Valloric/YouCompleteMe'
 Plug 'vim-syntastic/syntastic'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'Quramy/tsuquyomi'
+Plug 'burnettk/vim-angular'
+Plug 'gosukiwi/vim-atom-dark'
 call plug#end()
 
 " For Angular
@@ -73,11 +74,17 @@ let g:tsuquyomi_disable_quickfix = 1
 let g:syntastic_typescript_checkers = ['tsuquyomi'] 
 " Stop
 
-nnoremap <C-f> :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+nnoremap <C-H> <C-W>h
+nnoremap <C-E> <C-W>e
 
-colorscheme gruvbox
+
+" nnoremap <C-f>:NERDTreeFocus<CR>
+" nnoremap <C-n>:NERDTree<CR>
+nnoremap <C-t>:NERDTreeToggle<CR>
+
+colorscheme gruvbox 
 let g:bargreybars_auto=0
 let g:airline_solorized_bg='dark'
 let g:airline_powerline_fonts=1
@@ -90,23 +97,6 @@ let NERDTreeQuitOnOpen=1
 let g:mapleader = " "
 
 lua <<EOF
-require("nvim-tree").setup({
-  sort_by = "case_sensitive",
-  view = {
-    adaptive_size = true,
-    mappings = {
-      list = {
-        { key = "u", action = "dir_up" },
-      },
-    },
-  },
-  renderer = {
-    group_empty = true,
-  },
-  filters = {
-    dotfiles = true,
-  },
-});
 require"startup".setup()
 require"telescope".setup()
 require('neoscroll').setup()
@@ -294,3 +284,26 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+
+
+
+" If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
+" autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+"     \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
+" Open the existing NERDTree on each new tab.
+autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+
+" " Start NERDTree when Vim starts with a directory argument.
+" autocmd StdinReadPre * let s:std_in=1
+" autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists('s:std_in') |
+"     \ execute 'NERDTree' argv()[0] | wincmd p | enew | execute 'cd '.argv()[0] | endif
+
+" Start NERDTree. If a file is specified, move the cursor to its window.
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | endif
+
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+" Exit Vim if NERDTree is the only window remaining in the only tab.
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
