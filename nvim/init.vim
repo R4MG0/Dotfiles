@@ -16,6 +16,7 @@ filetype plugin indent on   " Allow auto-indenting depending on file type
 syntax on
 set spell " enable spell check (may need to download language package)
 set ttyfast " Speed up scrolling in Vim
+set laststatus=3
 
 call plug#begin(has('nvim') ? stdpath('data') . '/plugged' : '~/.vim/plugged')
 Plug 'rcarriga/nvim-notify'
@@ -54,6 +55,11 @@ Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'Quramy/tsuquyomi'
 Plug 'burnettk/vim-angular'
 Plug 'gosukiwi/vim-atom-dark'
+Plug 'bdauria/angular-cli.vim' 
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'EdenEast/nightfox.nvim' " Colorscheme
+Plug 'EdenEast/nightfox.nvim', { 'tag': 'v1.0.0' } " Vim-Plug
+Plug 'sbdchd/neoformat'
 call plug#end()
 
 " For Angular
@@ -62,8 +68,12 @@ let g:typescript_compiler_options = ''
 autocmd QuickFixCmdPost [^l]* nested cwindow
 autocmd QuickFixCmdPost    l* nested lwindow
 
+set background=dark 
 autocmd FileType typescript JsPreTmpl html
 autocmd FileType typescript syn clear foldBraces
+
+autocmd FileType typescript,html call angular_cli#init()`
+" let g:angular_cli_use_dispatch = 1
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -73,6 +83,9 @@ let g:syntastic_check_on_wq = 0
 let g:tsuquyomi_disable_quickfix = 1
 let g:syntastic_typescript_checkers = ['tsuquyomi'] 
 " Stop
+
+
+let g:nerdtree_tabs_synchronize_view=0
 
 nnoremap <C-J> <C-W>j
 nnoremap <C-K> <C-W>k
@@ -84,7 +97,10 @@ nnoremap <C-E> <C-W>e
 " nnoremap <C-n>:NERDTree<CR>
 nnoremap <C-t>:NERDTreeToggle<CR>
 
-colorscheme gruvbox 
+set termguicolors
+colorscheme duskfox 
+
+
 let g:bargreybars_auto=0
 let g:airline_solorized_bg='dark'
 let g:airline_powerline_fonts=1
@@ -97,6 +113,20 @@ let NERDTreeQuitOnOpen=1
 let g:mapleader = " "
 
 lua <<EOF
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = "all",
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = true,
+  -- Automatically install missing parsers when entering buffer
+  auto_install = true,
+
+  highlight = {
+    enable = true,
+  },
+}
+
 require"startup".setup()
 require"telescope".setup()
 require('neoscroll').setup()
@@ -287,6 +317,19 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 
 
+
+augroup nerdtreeconcealbrackets
+      autocmd!
+      autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\]" contained conceal containedin=ALL
+      autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\[" contained conceal containedin=ALL
+      autocmd FileType nerdtree setlocal conceallevel=3
+      autocmd FileType nerdtree setlocal concealcursor=nvic
+augroup END
+
+
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 &&!exists("s:std_in") | NERDTreeToggle | endif
+
 " If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
 " autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
 "     \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
@@ -306,4 +349,4 @@ autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | e
 autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+a
